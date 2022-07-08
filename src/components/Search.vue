@@ -19,30 +19,36 @@
 import users from '@/data/user.json'
 import {ref, computed} from 'vue'
 import { useVkGet } from './hooks/useVkGet'
+import { fetching } from './hooks/vkGet'
 
 export default {
   setup(props) {
     let searchTerm = ref('')
+    let u = []
 
-    /* let { vkUsers, totalPages, isUsersLoading } = useVkGet('Roma', 10); */
-    console.log(useVkGet('Roma', 10).vkUsers._value);
+    
+/*     fetching('Roma', 10).then((get) => {u = get; console.log(u); filterUsers()})
+    console.log(users)
+    console.log(u) */
 
-    const searchPeople = computed(() => {
-      if (searchTerm.value === '') {
-        return []
-      }
-
-      
-/*       console.log(useVkGet('Roma', 10).vkUsers)  */
-      
+    
+    const filterUsers = (users) => {
       let matches = 0
-
-      return users.filter(user => {
+      users.filter(user => {
         if (user.last_name.toLowerCase().includes(searchTerm.value.toLowerCase()) && matches < 10) {
           matches++
           return user
         }
       })
+    }
+
+
+    const searchPeople = computed(() => {
+      if (searchTerm.value === '') {
+        return []
+      }
+      fetching(searchTerm.value, 10).then((get) => { u = get; return filterUsers(u) })
+      return u;
     });
 
     const selectPeople = (People) => {
